@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<ruleset name="{{Plugin_Name}} Coding Standards">
+	<description>PHPCS configuration for {{Plugin_Name}} plugin.</description>
+
+	<!-- Scan paths -->
+	<file>.</file>
+
+	<!-- Exclude paths -->
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/tests/*</exclude-pattern>
+	<exclude-pattern>/assets/build/*</exclude-pattern>
+
+	<!-- Use WordPress-Extra (includes WordPress-Core) -->
+	<rule ref="WordPress-Extra"/>
+
+	<!-- Use WordPress-Docs for documentation standards -->
+	<rule ref="WordPress-Docs"/>
+
+	<!-- Text domain -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="{{plugin-slug}}"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Minimum WordPress version -->
+	<config name="minimum_wp_version" value="6.0"/>
+
+	<!-- PHP compatibility -->
+	<config name="testVersion" value="8.0-"/>
+
+	<!-- Tab indentation -->
+	<arg name="tab-width" value="4"/>
+
+	<!-- Show colors and progress -->
+	<arg name="colors"/>
+	<arg value="sp"/>
+</ruleset>
