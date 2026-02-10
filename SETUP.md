@@ -4,11 +4,11 @@
 
 1. Click "Use this template" on GitHub to create a new repository
 2. Clone your new repository
-3. Run the placeholder replacement (see below)
-4. Run `composer install`
+3. Run the init script: `./scripts/init.sh`
+4. Delete the `scripts/` directory
 5. Start developing
 
-## Placeholder Replacement
+## Manual Setup (alternative to init.sh)
 
 Replace the following placeholders throughout all files:
 
@@ -20,49 +20,39 @@ Replace the following placeholders throughout all files:
 | `{{plugin-slug}}` | Plugin slug (lowercase-hyphen) | `wpexample` |
 | `{{plugin_prefix}}` | Function/option prefix (snake_case) | `wpexample` |
 | `plugin-name.php` | Main file (matches slug) | `wpexample.php` |
-| `plugin-name/` | Directory name (matches slug) | `wpexample/` |
 
-### One-liner replacement (macOS/Linux)
-
-```bash
-# Set your plugin details.
-SLUG="wpexample"
-NAME="WPExample"
-PREFIX="WPEXAMPLE"
-NAMESPACE="WPExample"
-SNAKE="wpexample"
-
-# Replace placeholders in all files.
-find . -type f \( -name "*.php" -o -name "*.json" -o -name "*.xml" \
-  -o -name "*.neon" -o -name "*.yml" -o -name "*.md" \) \
-  -not -path "./vendor/*" -not -path "./.git/*" \
-  -exec sed -i '' \
-    -e "s/{{Plugin_Name}}/$NAME/g" \
-    -e "s/{{Plugin_Namespace}}/$NAMESPACE/g" \
-    -e "s/{{PLUGIN_PREFIX}}/$PREFIX/g" \
-    -e "s/{{plugin-slug}}/$SLUG/g" \
-    -e "s/{{plugin_prefix}}/$SNAKE/g" \
-  {} +
-
-# Rename main plugin file.
-mv plugin-name.php "${SLUG}.php"
-
-# Update composer.json package name.
-sed -i '' "s|wpcy/{{plugin-slug}}|wpcy/${SLUG}|g" composer.json
-```
+Then run `composer install`.
 
 ## Quality Checks
 
 ```bash
-# PHPCS (coding standards).
-~/.composer/vendor/bin/phpcs --standard=phpcs.xml .
+# Run all checks at once.
+composer check
 
-# Auto-fix formatting.
-~/.composer/vendor/bin/phpcbf --standard=phpcs.xml .
-
-# PHPStan (static analysis).
-composer phpstan
-
-# Generate translation file.
-wp i18n make-pot . languages/${SLUG}.pot
+# Or run individually:
+composer lint      # PHP syntax check (Parallel Lint)
+composer phpcs     # Coding standards (PHPCS + WPCS)
+composer phpcbf    # Auto-fix formatting
+composer phpstan   # Static analysis (PHPStan level 6)
+composer test      # Unit tests (PHPUnit)
 ```
+
+## Version Management
+
+```bash
+# Bump version in all required locations.
+./scripts/bump-version.sh 1.2.3
+
+# Then commit and tag.
+git add -A
+git commit -m "Release v1.2.3"
+git tag v1.2.3
+git push && git push --tags
+```
+
+## Release
+
+Pushing a tag (`v*`) triggers the CI release job which:
+1. Runs all quality checks
+2. Builds a .zip with `wp dist-archive`
+3. Creates a GitHub Release with the .zip attached
